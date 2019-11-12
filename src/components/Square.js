@@ -7,15 +7,23 @@ export class Square extends Component {
 
     render() {
         const cell = this.props.cell;
-        const cellClasses = classNames({
-            'number': true,
-            'grayNumber': (Math.floor(cell.x / 3) % 2) ^ (Math.floor(cell.y / 3) % 2),
-            'locked': cell.locked,
+        const numberCase = classNames({
+            'numberCase': true,
+            'checker': (Math.floor(cell.x / 3) % 2) ^ (Math.floor(cell.y / 3) % 2),
             'focused': cell.focused,
             'selected': cell.selected
         });
+        const numberMain = classNames({
+            'numberMain': true,
+            'locked': cell.locked
+        });
         return (
-            <td className={cellClasses} onClick={this.props.select.bind(this, cell.index)}> <Tips tips={cell.tips}></Tips> {cell.number || ''}</td>
+            <td onClick={this.props.select.bind(this, cell.index)}>
+                <div className={numberCase}>
+                    {<Tips tips={cell.tips}></Tips>}
+                    <div className={numberMain}>{cell.number || ''}</div>
+                </div>
+            </td>
         )
     }
 }

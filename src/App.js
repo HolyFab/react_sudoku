@@ -21,6 +21,15 @@ class Cell {
         if (this.x === this.y)
             this.tips.push(this.x);
     }
+
+    ToggleTip(number) {
+        const i = this.tips.indexOf(number);
+        if (i >= 0)
+            this.tips.splice(i, 1);
+        else
+            this.tips.push(number);
+        this.tips.sort();
+    }
 }
 
 function FillSudoku() {
@@ -51,8 +60,14 @@ class App extends Component {
         console.log(this.state.selected);
         if (!this.state.selected || !(key >= 96 && key <= 105))
             return;
+
         var temp = this.state.sudoku;
-        temp[this.state.selected].number = key - 96;
+        if (event.ctrlKey) {
+            temp[this.state.selected].ToggleTip(key - 96);
+        }
+        else {
+            temp[this.state.selected].number = key - 96;
+        }
         this.setState({ sudoku: temp });
     }
 
