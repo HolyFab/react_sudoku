@@ -1,5 +1,5 @@
 {
-  "name": "react_crash_todo",
+  "name": "react_sudoku",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -9,13 +9,16 @@
     "react-dom": "^16.7.0",
     "react-router-dom": "^4.3.1",
     "react-scripts": "2.1.2",
-    "uuid": "^3.3.2"
+    "socketio": "^1.0.0",
+    "uuid": "^3.3.3"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "concurrently \"npm run server\" \"npm run react\"",
+    "react": "react-scripts start",
+    "server": "nodemon src/server/index.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject" 
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -25,5 +28,9 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "concurrently": "^5.0.0",
+    "nodemon": "^1.19.4"
+  }
 }

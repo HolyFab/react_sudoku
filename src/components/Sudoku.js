@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 class Sudoku extends Component {
     render() {
+
         const style = {
             margin: 'auto',
             width: "auto",

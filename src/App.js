@@ -1,78 +1,75 @@
+import io from 'socket.io-client'; 
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import {GAME_STATE, TOGGLE_TIP, INPUT_NUMBER, JOIN_ROOM} from './Events'
 import Header from './components/layout/Header';
 import Sudoku from './components/Sudoku';
+import RoomInfo from './components/RoomInfo';
+import JoinRoom from './components/JoinRoom';
 import About from './components/pages/About';
-
 import './App.css';
+import Cell from './Cell';
 
-class Cell {
-    constructor(number, locked, index) {
-        console.log(number);
-        this.number = number;
-        this.locked = locked;
-        this.index = index;
-        this.x = index % 9;
-        this.y = Math.floor(index / 9);
-        this.focused = false;
-        this.selected = false;
-        this.tips = [];
-
-        if (this.x === this.y)
-            this.tips.push(this.x);
-    }
-
-    ToggleTip(number) {
-        const i = this.tips.indexOf(number);
-        if (i >= 0)
-            this.tips.splice(i, 1);
-        else
-            this.tips.push(number);
-        this.tips.sort();
-    }
-}
-
-function FillSudoku() {
-    var arr = [
-        8, 7, 6, 9, 0, 0, 0, 0, 0,
-        0, 1, 0, 0, 6, 0, 0, 0, 0,
-        0, 4, 0, 3, 0, 5, 8, 0, 0,
-
-        4, 0, 0, 0, 0, 0, 2, 1, 0,
-        0, 9, 0, 5, 0, 0, 0, 0, 0,
-        0, 5, 0, 0, 4, 0, 3, 0, 6,
-
-        0, 2, 9, 0, 0, 0, 0, 0, 8,
-        0, 0, 4, 6, 9, 0, 1, 7, 3,
-        0, 0, 0, 0, 0, 1, 0, 0, 4
-    ];
-    return arr.map((n, i) => new Cell(n, !!n, i));
-}
+const socketUrl = 'http://localhost:3231/'; 
 
 class App extends Component {
     state = {
-        sudoku: FillSudoku(),
-        selected: undefined
+        sudoku: undefined,
+        socket: undefined,
+        selected: undefined,
+        room: undefined
     };
+
+    initSocket = () => {
+        const socket = io(socketUrl);
+        socket.on('connect', () => {
+            console.log("Connected");
+        });
+
+        socket.on(GAME_STATE, (room) => {
+            let {sudoku} = this.state;
+            if(sudoku)
+                room.gameState.forEach(cO => sudoku[cO.index].Set(cO));
+            else
+                sudoku = room.gameState.map(c => new Cell(c));
+            this.setState({sudoku, room});
+        });
+        this.setState({socket});
+    }
+
+    /*setUser = (user) => {
+        const { socket } = this.state;
+        socket.emit(USER_CONNECTED, user);
+        this.setState({user});
+    }
+
+    logout = () => {
+        const { socket } = this.state;
+        socket.emit(USER_DISCONNECTED)
+        this.setState({user: null});
+    }*/
 
     _handleNumberKey = (event) => {
         const key = event.keyCode;
-        console.log(this.state.selected);
         if (!this.state.selected || !(key >= 96 && key <= 105))
             return;
 
-        var temp = this.state.sudoku;
+        const val = key - 96
+        const {sudoku, selected, socket} = this.state;
         if (event.ctrlKey) {
-            temp[this.state.selected].ToggleTip(key - 96);
+            event.preventDefault();
+            if(key !== 96)
+                socket.emit(TOGGLE_TIP, selected, val);
         }
         else {
-            temp[this.state.selected].number = key - 96;
+            socket.emit(INPUT_NUMBER, selected, val);
         }
-        this.setState({ sudoku: temp });
+        this.setState({ sudoku });
     }
 
     componentWillMount() {
         document.addEventListener('keydown', this._handleNumberKey, false);
+        this.initSocket();
     }
 
     componentWillUnmount() {
@@ -80,7 +77,6 @@ class App extends Component {
     }
 
     select = (index) => {
-        console.log(index);
         var cell = this.state.sudoku[index];
         var unselect = cell.selected;
         this.setState({ selected: unselect ? undefined : index });
@@ -98,24 +94,40 @@ class App extends Component {
         });
     }
 
+    joinRoom = (room) =>{
+        const{ socket  } = this.state;
+        socket.emit(JOIN_ROOM, room);
+    }
+
     render() {
         return (
             <Router>
                 <div className='App'>
                     <div className='container'>
                         <Header />
-                        <Route
-                            exactpath='/'
-                            render={(props) => (
-                                <React.Fragment>
-                                    <Sudoku
-                                        sudoku={this.state.sudoku}
-                                        select={this.select}
-                                    />
-                                </React.Fragment>
-                            )}
-                        />
-                        <Route path='/about' component={About} />
+                        <Switch>
+                            <Route
+                                exact
+                                path='/'
+                                render={(props) => (
+                                    <React.Fragment>
+                                        {
+                                            this.state.room !== undefined && <RoomInfo room={this.state.room}></RoomInfo>
+                                        }
+                                        {
+                                            this.state.sudoku && this.state.sudoku.length === 81 
+                                            ?
+                                                <Sudoku sudoku={this.state.sudoku} select={this.select} />
+                                            :
+                                                <JoinRoom joinRoom={this.joinRoom} />
+                                        }
+                                        
+                                    </React.Fragment>
+                                )}
+                            />
+                            <Route path='/about' component={About} />
+                        </Switch>
+                        
                     </div>
                 </div>
             </Router>
