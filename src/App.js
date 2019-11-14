@@ -1,7 +1,7 @@
-import io from 'socket.io-client'; 
+import io from 'socket.io-client';
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import {GAME_STATE, TOGGLE_TIP, INPUT_NUMBER, JOIN_ROOM} from './Events'
+import { GAME_STATE, TOGGLE_TIP, INPUT_NUMBER, JOIN_ROOM } from './Events'
 import Header from './components/layout/Header';
 import Sudoku from './components/Sudoku';
 import RoomInfo from './components/RoomInfo';
@@ -10,7 +10,7 @@ import About from './components/pages/About';
 import './App.css';
 import Cell from './Cell';
 
-const socketUrl = 'http://localhost:3231/'; 
+const socketUrl = 'http://192.168.0.171:3231/';
 
 class App extends Component {
     state = {
@@ -27,14 +27,14 @@ class App extends Component {
         });
 
         socket.on(GAME_STATE, (room) => {
-            let {sudoku} = this.state;
-            if(sudoku)
+            let { sudoku } = this.state;
+            if (sudoku)
                 room.gameState.forEach(cO => sudoku[cO.index].Set(cO));
             else
                 sudoku = room.gameState.map(c => new Cell(c));
-            this.setState({sudoku, room});
+            this.setState({ sudoku, room });
         });
-        this.setState({socket});
+        this.setState({ socket });
     }
 
     /*setUser = (user) => {
@@ -55,10 +55,10 @@ class App extends Component {
             return;
 
         const val = key - 96
-        const {sudoku, selected, socket} = this.state;
+        const { sudoku, selected, socket } = this.state;
         if (event.ctrlKey) {
             event.preventDefault();
-            if(key !== 96)
+            if (key !== 96)
                 socket.emit(TOGGLE_TIP, selected, val);
         }
         else {
@@ -94,8 +94,8 @@ class App extends Component {
         });
     }
 
-    joinRoom = (room) =>{
-        const{ socket  } = this.state;
+    joinRoom = (room) => {
+        const { socket } = this.state;
         socket.emit(JOIN_ROOM, room);
     }
 
@@ -110,6 +110,7 @@ class App extends Component {
                                 exact
                                 path='/'
                                 render={(props) => (
+<<<<<<< Updated upstream
                                     
                                         <React.Fragment>
                                             {
@@ -124,11 +125,26 @@ class App extends Component {
                                             }
                                             
                                         </React.Fragment>
+=======
+                                    <React.Fragment>
+                                        {
+                                            this.state.room !== undefined && <RoomInfo room={this.state.room}></RoomInfo>
+                                        }
+                                        {
+                                            this.state.sudoku && this.state.sudoku.length === 81
+                                                ?
+                                                <Sudoku sudoku={this.state.sudoku} select={this.select} />
+                                                :
+                                                <JoinRoom joinRoom={this.joinRoom} />
+                                        }
+
+                                    </React.Fragment>
+>>>>>>> Stashed changes
                                 )}
                             />
                             <Route path='/about' component={About} />
                         </Switch>
-                        
+
                     </div>
                 </div>
             </Router>
