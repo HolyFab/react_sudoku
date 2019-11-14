@@ -24,11 +24,13 @@ class Sudoku extends Component {
             rows.push(<tr key={i}>{squares}</tr>)
         }
         return (
-            <table cellSpacing="0" id="sudokuTable" style={style}>
-                <tbody>
-                    {rows}
-                </tbody>
-            </table>
+            <div id="GameContainer">
+                <table cellSpacing="0" id="sudokuTable" style={style}>
+                    <tbody>
+                        {rows}
+                    </tbody>
+                </table>
+            </div>
         )
     }
 }

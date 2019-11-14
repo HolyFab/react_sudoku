@@ -50,7 +50,7 @@ module.exports = function(socket){
         players[socket.id] = roomName;
         socket.join(roomName);
         room.users.push(socket.id);
-        socket.emit(GAME_STATE, room);
+        io.in(room.name).emit(GAME_STATE, room);
     });
 
     socket.on('disconnect', (reason)=>{
@@ -61,6 +61,7 @@ module.exports = function(socket){
         if(i >= 0)
             room.users.splice(i,1);
         delete players[socket.id];
+        io.in(room.name).emit(GAME_STATE, room);
     });
 }
 

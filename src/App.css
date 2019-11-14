@@ -73,3 +73,14 @@ div.numberMain{
     text-align: center;
     vertical-align: middle;
 }
+
+div#RoomContainer{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+div#RoomInfo{
+    display: flex;
+    flex-direction: column;
+}
