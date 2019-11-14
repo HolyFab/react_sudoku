@@ -110,36 +110,20 @@ class App extends Component {
                                 exact
                                 path='/'
                                 render={(props) => (
-<<<<<<< Updated upstream
-                                    
-                                        <React.Fragment>
-                                            {
-                                                this.state.sudoku && this.state.sudoku.length === 81 
-                                                ?
-                                                    <div id="RoomContainer">
-                                                        {this.state.room !== undefined && <RoomInfo room={this.state.room}></RoomInfo>}
-                                                        <Sudoku sudoku={this.state.sudoku} select={this.select} />
-                                                    </div>
-                                                :
-                                                    <JoinRoom joinRoom={this.joinRoom} />
-                                            }
-                                            
-                                        </React.Fragment>
-=======
+
                                     <React.Fragment>
-                                        {
-                                            this.state.room !== undefined && <RoomInfo room={this.state.room}></RoomInfo>
-                                        }
                                         {
                                             this.state.sudoku && this.state.sudoku.length === 81
                                                 ?
-                                                <Sudoku sudoku={this.state.sudoku} select={this.select} />
+                                                <div id="RoomContainer">
+                                                    {this.state.room !== undefined && <RoomInfo room={this.state.room}></RoomInfo>}
+                                                    <Sudoku sudoku={this.state.sudoku} select={this.select} />
+                                                </div>
                                                 :
                                                 <JoinRoom joinRoom={this.joinRoom} />
                                         }
 
                                     </React.Fragment>
->>>>>>> Stashed changes
                                 )}
                             />
                             <Route path='/about' component={About} />
